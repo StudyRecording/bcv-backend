@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = [
+    "web",
+    "utils"
+]
+
+[workspace.package]
+edition = "2021"
+authors = ["hpc"]
+
+[workspace.dependencies]
+utils = { path = "utils" }
+actix-web = "4.9.0"
+serde = "1.0.215"
+serde_derive = "1.0.215"
+serde_json = "1.0.132"
+
+[profile.dev]
+debug = 0
+
+[profile.release]
+opt-level = 3
