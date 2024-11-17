@@ -8,3 +8,7 @@ authors = { workspace = true }
 # utils = { path = "../utils" }
 utils = { workspace = true }
 actix-web = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_derive = { workspace = true }
+actix-multipart = { workspace = true }

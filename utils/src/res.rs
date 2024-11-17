@@ -12,7 +12,7 @@ pub struct ResultRes<'a, T: 'a> {
     msg: &'a str,
 }
 
-impl<'a, T: ToString> ResultRes<'a, T> {
+impl<'a, T> ResultRes<'a, T> {
 
     // 请求成功返回
     pub fn success(data: T) -> ResultRes<'a, T> {
