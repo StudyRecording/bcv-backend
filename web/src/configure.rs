@@ -1,6 +1,6 @@
 use actix_web::web;
 
-use crate::hello::{download, hello_world, path, post, save_files};
+use crate::hello::{download, exception, hello_world, path, post, save_files};
 
 
 /**
@@ -11,7 +11,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(path)
         .service(post)
         .service(save_files)
-        .service(download);
+        .service(download)
+        .service(exception);
 }
 
 

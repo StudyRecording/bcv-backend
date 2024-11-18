@@ -3,7 +3,7 @@ use std::{fs::File, io::Read};
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{get, http::header::ContentDisposition, post, web::{Json, Path}, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
-use utils::res::ResultRes;
+use utils::{err::ResultErr, res::ResultRes};
 
 #[get("/hello")]
 pub async fn hello_world() -> impl Responder {
@@ -59,4 +59,18 @@ pub async fn download() -> impl Responder {
                 .content_type("application/octet-stream")
                 .append_header(ContentDisposition::attachment("测试.txt"))
                 .body(content)
+}
+
+
+#[get("/exception/{pa}")]
+pub async fn exception(pa: Path<String>) -> Result<impl Responder, ResultErr> {
+    let path_param = pa.into_inner();
+    if path_param == "sys_err" {
+        return Err(ResultErr::SysErr);
+    }
+    if path_param == "biz_err" {
+        return Err(ResultErr::BizErr { msg: "业务错误".to_string() })
+    }
+    Ok(ResultRes::success(""))
+
 }
