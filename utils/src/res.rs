@@ -31,12 +31,12 @@ impl<'a, T> ResultRes<'a, T> {
 
     // 系统错误
     pub fn sys_err(data: T) -> ResultRes<'a, T> {
-        Self { success: false, data, code: 5001, msg: "系统错误" }
+        Self { success: false, data, code: 500, msg: "系统错误" }
     }
 
     // 业务错误
     pub fn biz_err(data: T, msg: &'a str) -> ResultRes<'a, T> {
-        Self { success: false, data, code: 5002, msg }
+        Self { success: false, data, code: 2001, msg }
     }
 
 }

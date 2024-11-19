@@ -1,4 +1,4 @@
-use actix_web::{error, http::header::ContentType, HttpResponse};
+use actix_web::{body::MessageBody, dev::{self, ServiceResponse}, error, http::{header::{self, ContentType}, StatusCode}, middleware::ErrorHandlerResponse, HttpResponse};
 use derive_more::derive::{Display, Error};
 
 use crate::res::ResultRes;
@@ -28,7 +28,11 @@ impl ResultErr {
 
 impl error::ResponseError for ResultErr {
     fn status_code(&self) -> actix_web::http::StatusCode {
-        actix_web::http::StatusCode::OK
+        match self {
+            ResultErr::SysErr => StatusCode::INTERNAL_SERVER_ERROR,
+            ResultErr::BizErr { msg: _ } => actix_web::http::StatusCode::OK,
+        }
+        
         
     }
 
@@ -38,6 +42,23 @@ impl error::ResponseError for ResultErr {
             .content_type(ContentType::json())
             .body(self.error_handler().unwrap())
     }
+}
+
+
+/// 错误全局处理程序
+pub fn error_handler<B>(res: dev::ServiceResponse<B>) -> error::Result<ErrorHandlerResponse<B>> {
+    
+    let (req, res) = res.into_parts();
+    
+    let res = ServiceResponse::new(req, res)
+        .map_body(|a, _body| {
+            a.headers_mut()
+                .insert(header::CONTENT_TYPE, header::HeaderValue::from_static("application/json"));
+            serde_json::to_string(&ResultRes::sys_err("")).unwrap().boxed()
+        })
+        .map_into_right_body();
+    
+    Ok(ErrorHandlerResponse::Response(res))
 }
 
 

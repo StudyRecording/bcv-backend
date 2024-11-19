@@ -1,7 +1,7 @@
 use std::{fs::File, io::Read};
 
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
-use actix_web::{get, http::header::ContentDisposition, post, web::{Json, Path}, HttpResponse, Responder};
+use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{Json, Path}, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
 use utils::{err::ResultErr, res::ResultRes};
 
@@ -72,5 +72,12 @@ pub async fn exception(pa: Path<String>) -> Result<impl Responder, ResultErr> {
         return Err(ResultErr::BizErr { msg: "业务错误".to_string() })
     }
     Ok(ResultRes::success(""))
+}
 
+#[get("/er/{pa}")]
+pub async fn er(pa: Path<String>) -> Result<impl Responder, UrlGenerationError> {
+    if pa.into_inner() == "1" {
+        return Err(UrlGenerationError::NotEnoughElements);
+    }
+    Ok(ResultRes::success(""))
 }
