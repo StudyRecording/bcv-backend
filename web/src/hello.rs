@@ -3,6 +3,7 @@ use std::{fs::File, io::Read};
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{Json, Path}, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
+use tracing::{error, info};
 use utils::{err::ResultErr, res::ResultRes};
 
 #[get("/hello")]
@@ -61,16 +62,21 @@ pub async fn download() -> impl Responder {
                 .body(content)
 }
 
-
+#[tracing::instrument]
 #[get("/exception/{pa}")]
 pub async fn exception(pa: Path<String>) -> Result<impl Responder, ResultErr> {
     let path_param = pa.into_inner();
+    info!("start..");
     if path_param == "sys_err" {
+        error!("system error");
         return Err(ResultErr::SysErr);
     }
     if path_param == "biz_err" {
+        error!("biz err");
         return Err(ResultErr::BizErr { msg: "业务错误".to_string() })
     }
+
+    info!("end...");
     Ok(ResultRes::success(""))
 }
 
