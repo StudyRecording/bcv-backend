@@ -15,3 +15,6 @@ actix-multipart = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 tracing-appender = { workspace = true }
+futures-util = { workspace = true }
+futures = { workspace = true }
+actix-http = { workspace = true }

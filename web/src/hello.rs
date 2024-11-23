@@ -1,7 +1,7 @@
 use std::{fs::File, io::Read};
 
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
-use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{Json, Path}, HttpResponse, Responder};
+use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{self, Json, Path}, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
 use tracing::{error, info};
 use utils::{err::ResultErr, res::ResultRes};
@@ -18,14 +18,16 @@ pub async fn path(path: Path<String>) -> impl Responder {
     ResultRes::success(name)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Info {
     name: String,
     age: u8,
 }
 
+// #[tracing::instrument]
 #[post("/post")]
 pub async fn post(info: Json<Info>) -> impl Responder {
+    info!("post method...");
     let res_info = info.into_inner();
     ResultRes::success(res_info)
 }
@@ -86,4 +88,9 @@ pub async fn er(pa: Path<String>) -> Result<impl Responder, UrlGenerationError> 
         return Err(UrlGenerationError::NotEnoughElements);
     }
     Ok(ResultRes::success(""))
+}
+
+#[get("/query")]
+pub async fn query_info(info: web::Query<Info>) -> Result<impl Responder, ResultErr> {
+    Ok(ResultRes::success(info.into_inner()))
 }
