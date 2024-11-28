@@ -2,7 +2,6 @@
 
 use actix_web::{body::BoxBody, http::header::ContentType, HttpResponse, Responder};
 use serde::Serialize;
-use serde_derive::Serialize;
 
 #[derive(Serialize)]
 pub struct ResultRes<'a, T: 'a> {

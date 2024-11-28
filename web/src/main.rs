@@ -1,7 +1,12 @@
 
+use std::time::Duration;
+
 use actix_web::{http::StatusCode, middleware::{from_fn, ErrorHandlers}, web, App, HttpServer};
+use app_data::AppState;
 use configure::config;
 use log::log_middleware;
+use migration::{Migrator, MigratorTrait};
+use sea_orm::{ConnectOptions, Database};
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::util::SubscriberInitExt;
 use utils::err::error_handler;
@@ -9,6 +14,7 @@ use utils::err::error_handler;
 pub mod hello;
 pub mod configure;
 pub mod log;
+pub mod app_data;
 
 
 #[actix_web::main]
@@ -19,13 +25,38 @@ async fn main() -> std::io::Result<()> {
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
     log::log(non_blocking, "info".into()).init();
 
+    // 连接数据库
+    // let db: DatabaseConnection = Database::connect("sqlite://db/bcv.db?mode=rwc").await?;
+
+    let mut opt = ConnectOptions::new("sqlite://db/bcv.db?mode=rwc");
+    opt.max_connections(7)
+        .min_connections(3)
+        .connect_timeout(Duration::from_secs(8))
+        .acquire_timeout(Duration::from_secs(8))
+        .idle_timeout(Duration::from_secs(8))
+        .max_lifetime(Duration::from_secs(8))
+        .sqlx_logging(false)
+        // .sqlx_logging_level(log::LevelFilter::Info)
+        .set_schema_search_path("bcv"); // Setting default PostgreSQL schema
+
+    let conn = match Database::connect(opt).await {
+        Ok(db) => db,
+        Err(e) => panic!("获取数据库连接失败, 原因: {}", e.to_string()),
+    };
+
+    // 如果表不存在则创建
+    Migrator::up(&conn, None).await.unwrap();
+
+    let app_data = AppState { conn };
+
     // 启动应用
-    HttpServer::new(|| {
+    HttpServer::new( move | | {
         App::new()
             .wrap(
                 ErrorHandlers::new()
                     .handler(StatusCode::INTERNAL_SERVER_ERROR, error_handler)
             )
+            .app_data(web::Data::new(app_data.clone()))
             .wrap(from_fn(log_middleware))
             .service(web::scope("/api").configure(config))
     })

@@ -6,6 +6,9 @@ authors = { workspace = true }
 
 [dependencies]
 # utils = { path = "../utils" }
+service = { workspace = true }
+entity = { workspace = true }
+migration = { workspace = true }
 utils = { workspace = true }
 actix-web = { workspace = true }
 serde = { workspace = true }
@@ -18,3 +21,4 @@ tracing-appender = { workspace = true }
 futures-util = { workspace = true }
 futures = { workspace = true }
 actix-http = { workspace = true }
+sea-orm = { workspace = true }
