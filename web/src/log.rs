@@ -1,8 +1,8 @@
 use std::{future::IntoFuture, io};
 
 use actix_web::{body::MessageBody, dev::{self, ServiceRequest, ServiceResponse}, middleware::Next, web::{self, Bytes}, Error, FromRequest};
-use tracing::{info, Subscriber};
-use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter};
+use tracing::{info, level_filters::LevelFilter, Subscriber};
+use tracing_subscriber::{fmt::MakeWriter, layer::SubscriberExt, EnvFilter, Layer};
 use futures_util::StreamExt;
 
 /// 初始化log
@@ -13,7 +13,8 @@ where
     // 日志——控制台
     let stdout_layer = tracing_subscriber::fmt::layer()
         .pretty()
-        .with_writer(io::stdout);
+        .with_writer(io::stdout)
+        .with_filter(LevelFilter::DEBUG);
 
     // 日志——文件
     let file_layer = tracing_subscriber::fmt::layer()
@@ -22,13 +23,14 @@ where
         .with_thread_ids(true)
         .compact()
         .with_ansi(false)
-        .with_writer(w);
+        .with_writer(w)
+        .with_filter(EnvFilter::new(env_filter));
 
     // 日志等级
-    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
+    // let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
 
     tracing_subscriber::registry()
-        .with(env_filter)
+        // .with(env_filter)
         .with(stdout_layer)
         .with(file_layer)
         // .init();
