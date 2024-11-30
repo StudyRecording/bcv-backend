@@ -19,7 +19,7 @@ impl ResultErr {
     fn error_handler(&self) -> Result<String, serde_json::Error> {
         let body = match self {
             ResultErr::SysErr => serde_json::to_string(&ResultRes::sys_err("")),
-            ResultErr::BizErr { msg } => serde_json::to_string(&ResultRes::biz_err("", msg.as_str())),
+            ResultErr::BizErr { msg } => serde_json::to_string(&ResultRes::biz_err("", msg.into())),
         };
         body
     }
