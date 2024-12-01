@@ -2,7 +2,9 @@
 use std::time::Duration;
 
 use actix_web::{http::StatusCode, middleware::{from_fn, ErrorHandlers}, web, App, HttpServer};
+use actix_web_httpauth::middleware::HttpAuthentication;
 use app_data::AppState;
+use auth::validator;
 use configure::config;
 use log::log_middleware;
 use migration::{Migrator, MigratorTrait};
@@ -15,7 +17,8 @@ pub mod hello;
 pub mod configure;
 pub mod log;
 pub mod app_data;
-
+pub mod auth;
+pub mod login;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -57,6 +60,7 @@ async fn main() -> std::io::Result<()> {
                     .handler(StatusCode::INTERNAL_SERVER_ERROR, error_handler)
             )
             .app_data(web::Data::new(app_data.clone()))
+            .wrap(HttpAuthentication::with_fn(validator))
             .wrap(from_fn(log_middleware))
             .service(web::scope("/api").configure(config))
     })

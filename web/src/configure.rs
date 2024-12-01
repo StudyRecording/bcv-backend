@@ -1,6 +1,6 @@
 use actix_web::web;
 
-use crate::hello::{create, download, er, exception, hello_world, path, post, query_info, save_files};
+use crate::{hello::{create, download, er, exception, hello_world, path, post, query_info, save_files}, login::login::login};
 
 
 /**
@@ -15,7 +15,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(exception)
         .service(er)
         .service(query_info)
-        .service(create);
+        .service(create)
+        .service(login);
 }
 
 

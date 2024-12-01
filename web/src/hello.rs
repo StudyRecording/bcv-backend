@@ -96,8 +96,11 @@ pub async fn er(pa: Path<String>) -> Result<impl Responder, UrlGenerationError> 
 
 #[get("/query")]
 pub async fn query_info(info: web::Query<Info>) -> Result<impl Responder, ResultErr> {
+    
     Ok(ResultRes::success(info.into_inner()))
 }
+
+
 
 
 #[post("/create")]

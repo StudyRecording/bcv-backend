@@ -22,3 +22,6 @@ futures-util = { workspace = true }
 futures = { workspace = true }
 actix-http = { workspace = true }
 sea-orm = { workspace = true }
+actix-web-httpauth = { workspace = true }
+jsonwebtoken = { workspace = true }
+chrono = { workspace = true }
