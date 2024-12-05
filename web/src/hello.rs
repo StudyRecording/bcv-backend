@@ -3,12 +3,8 @@ use std::{fs::File, io::Read};
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{self, Json, Path}, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
-use service::Mutation;
 use tracing::{error, info};
 use utils::{err::ResultErr, res::ResultRes};
-use entity::post::Model;
-
-use crate::app_data::AppState;
 
 #[get("/hello")]
 pub async fn hello_world() -> impl Responder {
@@ -103,18 +99,18 @@ pub async fn query_info(info: web::Query<Info>) -> Result<impl Responder, Result
 
 
 
-#[post("/create")]
-pub async fn create(
-    data: web::Data<AppState>,
-    post_form: web::Json<Model>,
-) -> Result<impl Responder, ResultErr> {
-    let conn = &data.conn;
+// #[post("/create")]
+// pub async fn create(
+//     data: web::Data<AppState>,
+//     post_form: web::Json<Model>,
+// ) -> Result<impl Responder, ResultErr> {
+//     let conn = &data.conn;
 
-    let form = post_form.into_inner();
+//     let form = post_form.into_inner();
 
-    Mutation::create_post(conn, form)
-        .await
-        .expect("could not insert post");
+//     Mutation::create_post(conn, form)
+//         .await
+//         .expect("could not insert post");
 
-    Ok(ResultRes::success(true))
-}
+//     Ok(ResultRes::success(true))
+// }

@@ -3,12 +3,12 @@ use std::time::Duration;
 
 use actix_web::{http::StatusCode, middleware::{from_fn, ErrorHandlers}, web, App, HttpServer};
 use actix_web_httpauth::middleware::HttpAuthentication;
-use app_data::AppState;
 use auth::validator;
 use configure::config;
 use log::log_middleware;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
+use service::AppState;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::util::SubscriberInitExt;
 use utils::err::error_handler;
@@ -16,7 +16,6 @@ use utils::err::error_handler;
 pub mod hello;
 pub mod configure;
 pub mod log;
-pub mod app_data;
 pub mod auth;
 pub mod login;
 

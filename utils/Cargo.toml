@@ -12,3 +12,4 @@ serde_derive = { workspace = true }
 derive_more = { workspace = true }
 jsonwebtoken = { workspace = true }
 chrono = { workspace = true }
+rand = { workspace = true }

@@ -5,8 +5,17 @@ edition.workspace = true
 authors.workspace = true
 
 [dependencies]
+utils = { workspace = true }
 entity = { workspace = true }
 sea-orm = { workspace = true }
+crypto = { workspace = true }
+sha2 = { workspace = true }
+rand = { workspace = true }
+base64 = { workspace = true }
+argon2 = { workspace = true }
+tracing = { workspace = true }
+chrono = { workspace = true }
+
 
 [dev-dependencies]
 tokio = { version = "1.20.0", features = ["macros", "rt"] }

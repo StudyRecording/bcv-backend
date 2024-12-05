@@ -2,6 +2,7 @@
 pub mod res;
 pub mod err;
 pub mod token;
+pub mod user_info;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
