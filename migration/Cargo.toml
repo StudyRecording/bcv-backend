@@ -9,6 +9,7 @@ name = "migration"
 path = "src/lib.rs"
 
 [dependencies]
+utils = { workspace = true }
 async-std = { version = "1", features = ["attributes", "tokio1"] }
 entity = { workspace = true }
 chrono = { workspace = true }

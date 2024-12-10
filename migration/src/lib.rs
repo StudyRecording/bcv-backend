@@ -3,6 +3,8 @@ pub use sea_orm_migration::prelude::*;
 mod m20220101_000001_create_table;
 mod m20241202_113447_create_table;
 mod m20241203_120431_create_table;
+mod m20241210_120723_create_table;
+mod m20241210_125348_insert_data;
 
 pub struct Migrator;
 
@@ -13,6 +15,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20220101_000001_create_table::Migration),
             Box::new(m20241202_113447_create_table::Migration),
             Box::new(m20241203_120431_create_table::Migration),
+            Box::new(m20241210_120723_create_table::Migration),
+            Box::new(m20241210_125348_insert_data::Migration),
         ]
     }
 }

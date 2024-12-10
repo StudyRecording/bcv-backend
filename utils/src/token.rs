@@ -36,13 +36,13 @@ pub fn valid_token(token: String, secret: String) -> Result<jsonwebtoken::TokenD
 }
 
 /// 获取加密的盐
-pub fn get_salt() -> String {
+pub fn get_secret(num: i32) -> String {
     let mut rng = rand::thread_rng();
     let chars: Vec<char> = ('a'..='z')
         .chain('A'..='Z')
         .chain('0'..='9')
         .collect();
-    (0..5).into_iter()
+    (0..num).into_iter()
         .map(|_| chars.get(rng.gen_range(0..chars.len())).unwrap_or(&'0'))
         .collect::<String>()
 }
@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn test_gen_salt() {
-        let salt = get_salt();
-        println!("salt is {salt}");
+        let salt = get_secret(32);
+        println!("salt is {salt}, len is {}", salt.len());
     }
 }
