@@ -8,6 +8,7 @@ authors = { workspace = true }
 # utils = { path = "../utils" }
 service = { workspace = true }
 entity = { workspace = true }
+pojo = { workspace = true }
 migration = { workspace = true }
 utils = { workspace = true }
 actix-web = { workspace = true }

@@ -1,10 +1,13 @@
-
 use std::time::Duration;
 
-use actix_web::{http::StatusCode, middleware::{from_fn, ErrorHandlers}, web, App, HttpServer};
+use actix_web::{
+    http::StatusCode,
+    middleware::{from_fn, ErrorHandlers},
+    web, App, HttpServer,
+};
 use actix_web_httpauth::middleware::HttpAuthentication;
 use auth::validator;
-use configure::config;
+use configure::{book_config, config};
 use log::log_middleware;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
@@ -13,15 +16,15 @@ use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::util::SubscriberInitExt;
 use utils::err::error_handler;
 
-pub mod hello;
-pub mod configure;
-pub mod log;
 pub mod auth;
+pub mod book;
+pub mod configure;
+pub mod hello;
+pub mod log;
 pub mod login;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
     // 日志
     let file_appender = RollingFileAppender::new(Rotation::DAILY, "web/file", "log");
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
@@ -52,19 +55,22 @@ async fn main() -> std::io::Result<()> {
     let app_data = AppState { conn };
 
     // 启动应用
-    HttpServer::new( move | | {
+    HttpServer::new(move || {
         App::new()
-            .wrap(
-                ErrorHandlers::new()
-                    .handler(StatusCode::INTERNAL_SERVER_ERROR, error_handler)
-            )
+            .wrap(ErrorHandlers::new().handler(StatusCode::INTERNAL_SERVER_ERROR, error_handler))
             .app_data(web::Data::new(app_data.clone()))
-            .wrap(HttpAuthentication::with_fn(validator))
             .wrap(from_fn(log_middleware))
-            .service(web::scope("/api").configure(config))
+            .service(
+                web::scope("/api")
+                    .service(web::scope("/book").configure(book_config))
+                    .service(
+                        web::scope("/test")
+                            .wrap(HttpAuthentication::with_fn(validator))
+                            .configure(config),
+                    ),
+            )
     })
     .bind(("127.0.0.1", 8080))?
     .run()
     .await
-
 }

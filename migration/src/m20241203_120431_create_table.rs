@@ -27,9 +27,9 @@ impl MigrationTrait for Migration {
             password: Set("$argon2id$v=19$m=19456,t=2,p=1$yYEngmErBM3yOUdJiUxVgg$cpMABCeywcfs2H14FyG3z7oPDOiRD2pn3fMKOJQ3QC8".to_owned()),
             salt: Set("yYEngmErBM3yOUdJiUxVgg".to_owned()),
             status: Set(1),
-            create_time: Set(Local::now()),
+            create_time: Set(Local::now().naive_local()),
             create_user: Set("System".to_owned()),
-            update_time: Set(Local::now()),
+            update_time: Set(Local::now().naive_local()),
             update_user: Set("System".to_owned()),
         }
         .insert(db)

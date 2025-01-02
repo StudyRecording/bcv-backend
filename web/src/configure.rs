@@ -1,7 +1,10 @@
 use actix_web::web;
 
-use crate::{hello::{download, er, exception, hello_world, path, post, query_info, save_files}, login::login::login};
-
+use crate::{
+    book::book::{get_by_id, page_list, save},
+    hello::{download, er, exception, hello_world, path, post, query_info, save_files},
+    login::login::login,
+};
 
 /**
  * 配置路由
@@ -19,4 +22,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         .service(login);
 }
 
-
+/// 书籍配置
+pub fn book_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(save).service(get_by_id).service(page_list);
+}

@@ -7,6 +7,7 @@ authors.workspace = true
 [dependencies]
 utils = { workspace = true }
 entity = { workspace = true }
+pojo = { workspace = true }
 sea-orm = { workspace = true }
 crypto = { workspace = true }
 sha2 = { workspace = true }

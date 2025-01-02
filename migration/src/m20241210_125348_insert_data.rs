@@ -20,13 +20,13 @@ impl MigrationTrait for Migration {
             id: Set(1),
             access_secret: Set(get_secret(32)),
             refresh_secret: Set(get_secret(32)),
-            access_end_time: Set(Local::now().checked_add_days(Days::new(1))),
-            refresh_end_time: Set(Local::now().checked_add_days(Days::new(30))),
+            access_end_time: Set(Local::now().naive_local().checked_add_days(Days::new(1))),
+            refresh_end_time: Set(Local::now().naive_local().checked_add_days(Days::new(30))),
             status: Set(1),
             create_user: Set("System".into()),
-            create_time: Set(Local::now()),
+            create_time: Set(Local::now().naive_local()),
             update_user: Set("System".into()),
-            update_time: Set(Local::now()),
+            update_time: Set(Local::now().naive_local()),
         }
         .insert(db)
         .await?;

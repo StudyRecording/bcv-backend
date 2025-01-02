@@ -2,6 +2,7 @@
 
 pub mod prelude;
 
+pub mod book_info;
 pub mod post;
 pub mod secret_info;
 pub mod user;

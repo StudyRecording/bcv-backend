@@ -5,8 +5,8 @@ members = [
     "utils",
     "entity",
     "migration", 
-    "service"
-]
+    "service", 
+    "pojo"]
 
 [workspace.package]
 edition = "2021"
@@ -15,6 +15,7 @@ authors = ["hpc"]
 [workspace.dependencies]
 service = { path = "service" }
 entity = { path = "entity" }
+pojo = { path = "pojo" }
 migration = { path = "migration" }
 utils = { path = "utils" }
 actix-web = "4"

@@ -39,3 +39,22 @@
     ```sh
     cargo run -- status
     ```
+
+
+- 生成entity/src文件
+
+  ```sh
+  sea-orm-cli generate entity --date-time-crate chrono --with-serde both -o entity/src
+  ```
+
+- 生成migration文件
+
+  ```sh
+  # 生成表创建文件
+  sea-orm-cli migrate generate "create table {表明}"
+
+  ```
+- 建表
+  ```sh 
+  sea-orm-cli migrate up
+  ```
