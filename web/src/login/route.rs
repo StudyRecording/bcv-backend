@@ -1,8 +1,8 @@
 use actix_web::web;
-use super::login::login;
 
+use super::user_login;
 
-/// 登录、注册
+/// 书籍配置
 pub fn login_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(login);
+    cfg.service(user_login);
 }

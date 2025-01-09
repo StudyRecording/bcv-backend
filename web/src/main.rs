@@ -9,7 +9,6 @@ use actix_web_httpauth::middleware::HttpAuthentication;
 use auth::validator;
 use configure::hello_config;
 use log::log_middleware;
-use login::login;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
 use service::AppState;
@@ -60,16 +59,13 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(ErrorHandlers::new().handler(StatusCode::INTERNAL_SERVER_ERROR, error_handler))
             .app_data(web::Data::new(app_data.clone()))
+            .wrap(HttpAuthentication::with_fn(validator))
             .wrap(from_fn(log_middleware))
             .service(
                 web::scope("/api")
-                    .service(login)
+                    .service(web::scope("/user").configure(login::route::login_config))
                     .service(web::scope("/book").configure(book::route::book_config))
-                    .service(
-                        web::scope("/test")
-                            .wrap(HttpAuthentication::with_fn(validator))
-                            .configure(hello_config),
-                    ),
+                    .service(web::scope("/test").configure(hello_config))
             )
     })
     .bind(("127.0.0.1", 8080))?
