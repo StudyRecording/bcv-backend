@@ -1,1 +1,4 @@
-pub mod book;
+mod book;
+pub mod route;
+
+pub use book::*;

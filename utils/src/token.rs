@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
     // 用户id
-    sub: i32,
+    pub sub: i32,
     // token过期时间
     exp: i64,
     // 签发时间

@@ -9,13 +9,14 @@ struct UserInfo {
     password: String,
 }
 
+/// 登录接口
 #[post("/login")]
 pub async fn login(
     info: web::Json<UserInfo>,
     data: web::Data<AppState>,
 ) -> Result<impl Responder, ResultErr> {
     let user_info = info.into_inner();
-    let info = service::login(user_info.account, user_info.password, &data.conn).await?;
+    let info = service::login::login(user_info.account, user_info.password, &data.conn).await?;
 
     Ok(ResultRes::success(info))
 }

@@ -44,7 +44,7 @@
 - 生成entity/src文件
 
   ```sh
-  sea-orm-cli generate entity --date-time-crate chrono --with-serde both -o entity/src
+  sea-orm-cli generate entity -l --date-time-crate chrono --with-serde both -o entity/src
   ```
 
 - 生成migration文件

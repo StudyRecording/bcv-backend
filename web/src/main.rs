@@ -7,8 +7,9 @@ use actix_web::{
 };
 use actix_web_httpauth::middleware::HttpAuthentication;
 use auth::validator;
-use configure::{book_config, config};
+use configure::hello_config;
 use log::log_middleware;
+use login::login;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
 use service::AppState;
@@ -62,11 +63,12 @@ async fn main() -> std::io::Result<()> {
             .wrap(from_fn(log_middleware))
             .service(
                 web::scope("/api")
-                    .service(web::scope("/book").configure(book_config))
+                    .service(login)
+                    .service(web::scope("/book").configure(book::route::book_config))
                     .service(
                         web::scope("/test")
                             .wrap(HttpAuthentication::with_fn(validator))
-                            .configure(config),
+                            .configure(hello_config),
                     ),
             )
     })

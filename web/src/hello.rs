@@ -1,13 +1,14 @@
 use std::{fs::File, io::Read};
 
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
-use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{self, Json, Path}, HttpResponse, Responder};
+use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{self, Json, Path}, HttpMessage, HttpRequest, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
 use tracing::{error, info};
 use utils::{err::ResultErr, res::ResultRes};
 
 #[get("/hello")]
 pub async fn hello_world() -> impl Responder {
+
     // HttpResponse::Ok().body("Hello World!")
     ResultRes::success("")
 }
@@ -26,8 +27,9 @@ struct Info {
 
 // #[tracing::instrument]
 #[post("/post")]
-pub async fn post(info: Json<Info>) -> impl Responder {
-    info!("post method...");
+pub async fn post(req: HttpRequest, info: Json<Info>) -> impl Responder {
+    let user_id = req.extensions().get::<i32>().unwrap().clone();
+    info!("post method..., user_id is {}", user_id);
     let res_info = info.into_inner();
     ResultRes::success(res_info)
 }
