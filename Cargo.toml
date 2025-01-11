@@ -39,6 +39,7 @@ sha2 = "0.10"
 rand = "0.8"
 base64 = "0.22"
 argon2 = "0.5.3"
+toml = "0.8.19"
 
 [profile.dev]
 debug = 0

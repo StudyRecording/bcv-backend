@@ -1,0 +1,31 @@
+# 服务配置
+[server]
+# 主机地址
+host = "127.0.0.1"
+# 服务端口
+port = 8080
+# 服务线程
+thread_num = 4
+shutdown_timeout = 30
+
+# 数据库配置
+[db]
+# 数据库连接
+url = "sqlite://db/bcv.db?mode=rwc"
+# 连接池最大连接数
+max_connections = 7
+# 连接池最小连接数
+min_connections = 3
+connect_timeout = 8
+acquire_timeout = 8
+idle_timeout = 8
+max_lifetime = 8
+sqlx_logging = false
+schema_search_path = "bcv"
+migrator_up = true
+
+# 日志配置
+[log]
+level = "info"
+dir = "web/file"
+log_file_prefix = "log"

@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::config::Config;
 use actix_web::{
     http::StatusCode,
     middleware::{from_fn, ErrorHandlers},
@@ -7,54 +8,65 @@ use actix_web::{
 };
 use actix_web_httpauth::middleware::HttpAuthentication;
 use auth::validator;
-use configure::hello_config;
 use log::log_middleware;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
 use service::AppState;
+use test_route::hello_config;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::util::SubscriberInitExt;
 use utils::err::error_handler;
 
 pub mod auth;
 pub mod book;
-pub mod configure;
 pub mod hello;
 pub mod log;
 pub mod login;
+pub mod test_route;
+mod config;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    // 获取配置
+    let config = match Config::new("web/config.toml") {
+        Ok(config) => config,
+        Err(e) => panic!("读取配置文件失败, 原因: {}", e)
+    };
+
     // 日志
-    let file_appender = RollingFileAppender::new(Rotation::DAILY, "web/file", "log");
+    let log_config = config.log;
+    let file_appender = RollingFileAppender::new(Rotation::DAILY, log_config.dir, log_config.log_file_prefix);
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
-    log::log(non_blocking, "info".into()).init();
+    log::log(non_blocking, log_config.level).init();
 
-    // 连接数据库
-    // let db: DatabaseConnection = Database::connect("sqlite://db/bcv.db?mode=rwc").await?;
-
-    let mut opt = ConnectOptions::new("sqlite://db/bcv.db?mode=rwc");
-    opt.max_connections(7)
-        .min_connections(3)
-        .connect_timeout(Duration::from_secs(8))
-        .acquire_timeout(Duration::from_secs(8))
-        .idle_timeout(Duration::from_secs(8))
-        .max_lifetime(Duration::from_secs(8))
-        .sqlx_logging(false)
+    // 数据库连接
+    let db_config = config.db;
+    let mut opt = ConnectOptions::new(db_config.url);
+    opt.max_connections(db_config.max_connections)
+        .min_connections(db_config.min_connections)
+        .connect_timeout(Duration::from_secs(db_config.connect_timeout))
+        .acquire_timeout(Duration::from_secs(db_config.acquire_timeout))
+        .idle_timeout(Duration::from_secs(db_config.idle_timeout))
+        .max_lifetime(Duration::from_secs(db_config.max_lifetime))
+        .sqlx_logging(db_config.sqlx_logging)
         // .sqlx_logging_level(log::LevelFilter::Info)
-        .set_schema_search_path("bcv"); // Setting default PostgreSQL schema
+        .set_schema_search_path(db_config.schema_search_path);
 
     let conn = match Database::connect(opt).await {
         Ok(db) => db,
-        Err(e) => panic!("获取数据库连接失败, 原因: {}", e.to_string()),
+        Err(e) => panic!("获取数据库连接失败, 原因: {}", e),
     };
 
-    // 如果表不存在则创建
-    Migrator::up(&conn, None).await.unwrap();
+    if db_config.migrator_up {
+        // 如果表不存在则创建
+        Migrator::up(&conn, None).await.unwrap();
+    }
 
     let app_data = AppState { conn };
 
     // 启动应用
+    let server_config = config.server;
     HttpServer::new(move || {
         App::new()
             .wrap(ErrorHandlers::new().handler(StatusCode::INTERNAL_SERVER_ERROR, error_handler))
@@ -65,10 +77,12 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api")
                     .service(web::scope("/user").configure(login::route::login_config))
                     .service(web::scope("/book").configure(book::route::book_config))
-                    .service(web::scope("/test").configure(hello_config))
+                    .service(web::scope("/test").configure(hello_config)),
             )
     })
-    .bind(("127.0.0.1", 8080))?
+    .workers(server_config.thread_num)
+    .shutdown_timeout(server_config.shutdown_timeout)
+    .bind((server_config.host, server_config.port))?
     .run()
     .await
 }
