@@ -18,6 +18,7 @@ pub async fn save(db: &DatabaseConnection, book_info: BookInfoSaveParam) -> Resu
         create_user: Set("system".into()),
         update_time: Set(Local::now().naive_local()),
         update_user: Set("system".into()),
+        user_id: Default::default(),
     }
     .save(db)
     .await;
@@ -33,12 +34,12 @@ pub async fn get_by_id(db: &DatabaseConnection, id: i32) -> Result<book_info::Mo
     let book_info = BookInfo::find_by_id(id).one(db).await;
     match book_info {
         Ok(b_info) => {
-            if b_info.is_some() {
-                return Ok(b_info.unwrap());
+            if let Some(b_i) = b_info {
+                Ok(b_i)
             } else {
-                return Err(ResultErr::BizErr {
+                Err(ResultErr::BizErr {
                     msg: "未找到相关数据".into(),
-                });
+                })
             }
         }
         Err(e) => Err(ResultErr::BizErr { msg: e.to_string() }),

@@ -65,7 +65,7 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-enum BookInfo {
+pub enum BookInfo {
     Table,
     Id,
     BookName,

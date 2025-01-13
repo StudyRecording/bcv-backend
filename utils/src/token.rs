@@ -20,9 +20,9 @@ pub struct Claims {
 /// 获取token
 pub fn get_token(sub: i32, exp: i64, account: String, secret: String) -> Result<String, jsonwebtoken::errors::Error> {
 
-    let cliaims = Claims {sub, exp, iat: Utc::now().timestamp(), account};
+    let claims = Claims {sub, exp, iat: Utc::now().timestamp(), account};
     let header = Header {alg: Algorithm::HS512, ..Default::default()};
-    let token = encode(&header, &cliaims, &EncodingKey::from_secret(secret.as_bytes()));
+    let token = encode(&header, &claims, &EncodingKey::from_secret(secret.as_bytes()));
     token
 }
 
@@ -58,7 +58,7 @@ mod tests {
     #[test]
     fn test_token() {
         let iat = Local::now();
-        let exp = iat.clone().checked_add_days(Days::new(1)).unwrap();
+        let exp = iat.checked_add_days(Days::new(1)).unwrap();
         
         let token = get_token(12233, exp.timestamp(), "hpc".into(), "qaz".into());
         let token = token.unwrap();

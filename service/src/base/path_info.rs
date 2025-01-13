@@ -17,7 +17,7 @@ pub async fn get_path_type(db: &DatabaseConnection, path: &str) -> Result<i8, Re
             if info.is_none() {
                 return Ok(0);
             }
-            return Ok(info.unwrap().r#type)
+            Ok(info.unwrap().r#type)
         },
         Err(e) => Err(ResultErr::BizErr { msg: e.to_string() }),
     }

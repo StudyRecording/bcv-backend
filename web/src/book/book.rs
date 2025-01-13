@@ -16,7 +16,7 @@ pub async fn save(
 ) -> Result<impl Responder, ResultErr> {
     let book_info = info.into_inner();
 
-    let save_result = service::book::save(&data.conn, book_info).await;
+    let save_result = book::save(&data.conn, book_info).await;
     match save_result {
         Ok(b) => Ok(ResultRes::success(b)),
         Err(_) => Err(ResultErr::BizErr {
@@ -28,7 +28,7 @@ pub async fn save(
 /// 获取详情
 #[get("/get/{id}")]
 pub async fn get_by_id(
-    id: actix_web::web::Path<i32>,
+    id: Path<i32>,
     data: Data<AppState>,
 ) -> Result<ResultRes<book_info::Model>, ResultErr> {
     let id = id.into_inner();

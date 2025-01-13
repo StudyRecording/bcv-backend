@@ -47,7 +47,7 @@ pub async fn log_middleware(req: ServiceRequest, next: Next<impl MessageBody>) -
     info!("method: {}, path: {}", method, path);
     let query_string = req.query_string();
 
-    let call = if query_string.len() > 0  {
+    let call = if !query_string.is_empty()  {
         // get请求参数
         info!("请求参数: {}", query_string);
         next.call(req).await
@@ -73,7 +73,7 @@ pub async fn log_middleware(req: ServiceRequest, next: Next<impl MessageBody>) -
 }
 
 /// 获取Payload
-fn bytes_to_payload(buf: web::Bytes) -> dev::Payload {
+fn bytes_to_payload(buf: Bytes) -> dev::Payload {
     let (_, mut pl) = actix_http::h1::Payload::create(true);
     pl.unread_data(buf);
     dev::Payload::from(pl)
