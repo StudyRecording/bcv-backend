@@ -7,7 +7,7 @@ use sea_orm::{
 use utils::{err::ResultErr, page::Page};
 
 /// 新增
-pub async fn save(db: &DatabaseConnection, book_info: BookInfoSaveParam) -> Result<bool, ResultErr> {
+pub async fn save(db: &DatabaseConnection, book_info: BookInfoSaveParam, user_id: i32) -> Result<bool, ResultErr> {
     let book_info = book_info::ActiveModel {
         id: NotSet,
         book_name: Set(book_info.book_name),
@@ -18,7 +18,7 @@ pub async fn save(db: &DatabaseConnection, book_info: BookInfoSaveParam) -> Resu
         create_user: Set("system".into()),
         update_time: Set(Local::now().naive_local()),
         update_user: Set("system".into()),
-        user_id: Default::default(),
+        user_id: Set(user_id),
     }
     .save(db)
     .await;

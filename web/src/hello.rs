@@ -28,7 +28,7 @@ struct Info {
 // #[tracing::instrument]
 #[post("/post")]
 pub async fn post(req: HttpRequest, info: Json<Info>) -> impl Responder {
-    let user_id = req.extensions().get::<i32>().unwrap().clone();
+    let user_id = *req.extensions().get::<i32>().unwrap();
     info!("post method..., user_id is {}", user_id);
     let res_info = info.into_inner();
     ResultRes::success(res_info)

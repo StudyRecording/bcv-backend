@@ -1,8 +1,5 @@
-use actix_web::{
-    get, post,
-    web::{Data, Json, Path},
-    Responder,
-};
+use actix_http::HttpMessage;
+use actix_web::{get, post, web::{Data, Json, Path}, HttpRequest, Responder};
 use entity::book_info;
 use pojo::book::BookInfoSaveParam;
 use service::{book, AppState};
@@ -11,12 +8,13 @@ use utils::{err::ResultErr, page::Page, res::ResultRes};
 /// 保存数据
 #[post("/save")]
 pub async fn save(
+    req: HttpRequest,
     info: Json<BookInfoSaveParam>,
     data: Data<AppState>,
 ) -> Result<impl Responder, ResultErr> {
     let book_info = info.into_inner();
-
-    let save_result = book::save(&data.conn, book_info).await;
+    let user_id = *req.extensions().get::<i32>().unwrap();
+    let save_result = book::save(&data.conn, book_info, user_id).await;
     match save_result {
         Ok(b) => Ok(ResultRes::success(b)),
         Err(_) => Err(ResultErr::BizErr {
