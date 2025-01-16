@@ -23,9 +23,9 @@ impl MigrationTrait for Migration {
             access_end_time: Set(Local::now().naive_local().checked_add_days(Days::new(1))),
             refresh_end_time: Set(Local::now().naive_local().checked_add_days(Days::new(30))),
             status: Set(1),
-            create_user: Set("System".into()),
+            create_user: Set("system".into()),
             create_time: Set(Local::now().naive_local()),
-            update_user: Set("System".into()),
+            update_user: Set("system".into()),
             update_time: Set(Local::now().naive_local()),
         }
         .insert(db)

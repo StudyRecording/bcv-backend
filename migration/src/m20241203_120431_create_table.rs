@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
             .all(db)
             .await?;
         
-        if user_vec.len() > 0 {
+        if !user_vec.is_empty() {
             return Ok(());
         }
 
@@ -28,9 +28,9 @@ impl MigrationTrait for Migration {
             salt: Set("yYEngmErBM3yOUdJiUxVgg".to_owned()),
             status: Set(1),
             create_time: Set(Local::now().naive_local()),
-            create_user: Set("System".to_owned()),
+            create_user: Set("system".to_owned()),
             update_time: Set(Local::now().naive_local()),
-            update_user: Set("System".to_owned()),
+            update_user: Set("system".to_owned()),
         }
         .insert(db)
         .await?;

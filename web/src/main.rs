@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::config::Config;
+use crate::config::{Config, Storage};
 use actix_web::{
     http::StatusCode,
     middleware::{from_fn, ErrorHandlers},
@@ -15,6 +15,7 @@ use service::AppState;
 use test_route::hello_config;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::util::SubscriberInitExt;
+use service::local_file_storage::init_file_config;
 use utils::err::error_handler;
 
 pub mod auth;
@@ -62,7 +63,14 @@ async fn main() -> std::io::Result<()> {
         // 如果表不存在则创建
         Migrator::up(&conn, None).await.unwrap();
     }
-
+    
+    // 初始化目录
+    let Storage { root_dir: _, book_dir, comic_dir, video_dir } = config.storage;
+    let init_storage = init_file_config(&conn, book_dir.unwrap(), comic_dir.unwrap(), video_dir.unwrap()).await;
+    if init_storage.is_err() { 
+        panic!("初始化文件存储目录失败");
+    }
+    
     let app_data = AppState { conn };
 
     // 启动应用

@@ -24,3 +24,4 @@ actix-http = { workspace = true }
 sea-orm = { workspace = true }
 actix-web-httpauth = { workspace = true }
 toml = { workspace = true }
+dirs = { workspace = true }

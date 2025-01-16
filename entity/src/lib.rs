@@ -3,6 +3,7 @@
 pub mod prelude;
 
 pub mod book_info;
+pub mod file_path_config;
 pub mod path_info;
 pub mod post;
 pub mod secret_info;

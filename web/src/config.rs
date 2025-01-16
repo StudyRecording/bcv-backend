@@ -35,11 +35,22 @@ pub struct Log {
     pub dir: String,
     pub log_file_prefix: String
 }
+
+/// 内容存储
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Storage {
+    pub root_dir: Option<String>,
+    pub book_dir: Option<String>,
+    pub comic_dir: Option<String>,
+    pub video_dir: Option<String>,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub server: Server,
     pub db: DB,
     pub log: Log,
+    pub storage: Storage,
 }
 
 impl Config {
@@ -64,7 +75,29 @@ impl Config {
         if config.is_err() {
             return Err(ResultErr::BizErr {msg: "配置文件解析失败".into()})
         }
-        Ok(config.unwrap())
+        
+        // 配置文件默认值设置
+        let config = config.unwrap();
+        let Config {server, db, log, storage} = config;
+        let storage = default_storage_config(storage);
+        
+        Ok(Config {server, db, log, storage})
+    }
+}
+
+/// 处理文件内容存储默认值
+fn default_storage_config(storage: Storage) -> Storage {
+    let Storage {root_dir, book_dir, comic_dir, video_dir} = storage;
+    
+    let home_dir = dirs::home_dir().unwrap().to_str().unwrap().to_string();
+    let home_dir = home_dir.replace("\\", "/");
+    let root_dir = root_dir.unwrap_or(home_dir + "/BCV");
+    
+    Storage {
+        root_dir: Some(root_dir.clone()), 
+        book_dir: Some(book_dir.unwrap_or(root_dir.clone() + "/books")), 
+        comic_dir: Some(comic_dir.unwrap_or(root_dir.clone() + "/comic")), 
+        video_dir: Some(video_dir.unwrap_or(root_dir.clone() + "/video")),
     }
 }
 

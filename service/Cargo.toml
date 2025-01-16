@@ -16,7 +16,8 @@ base64 = { workspace = true }
 argon2 = { workspace = true }
 tracing = { workspace = true }
 chrono = { workspace = true }
-
+actix-multipart = { workspace = true }
+serde = { version = "1.0.215", features = ["derive"] }
 
 [dev-dependencies]
 tokio = { version = "1.20.0", features = ["macros", "rt"] }

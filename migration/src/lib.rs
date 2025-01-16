@@ -8,6 +8,8 @@ mod m20241210_125348_insert_data;
 mod m20241231_133646_create_table;
 mod m20250108_084238_create_table_path_info;
 mod m20250113_031544_update_book_info_add_cloumn;
+mod m20250116_112246_create_table_file_path_config;
+mod m20250116_113825_apply_data_file_path_config;
 
 pub struct Migrator;
 
@@ -23,6 +25,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20241231_133646_create_table::Migration),
             Box::new(m20250108_084238_create_table_path_info::Migration),
             Box::new(m20250113_031544_update_book_info_add_cloumn::Migration),
+            Box::new(m20250116_112246_create_table_file_path_config::Migration),
+            Box::new(m20250116_113825_apply_data_file_path_config::Migration),
         ]
     }
 }

@@ -4,6 +4,8 @@ use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{error::UrlGenerationError, get, http::header::ContentDisposition, post, web::{self, Json, Path}, HttpMessage, HttpRequest, HttpResponse, Responder};
 use serde_derive::{Deserialize, Serialize};
 use tracing::{error, info};
+use service::AppState;
+use service::local_file_storage::save_file;
 use utils::{err::ResultErr, res::ResultRes};
 
 #[get("/hello")]
@@ -42,15 +44,11 @@ struct Uploadform{
 
 #[post("/save")]
 pub async fn save_files(
-    MultipartForm(form): MultipartForm<Uploadform>
-) -> impl Responder {
-
-    let mut buffer = Vec::new();
-
-    let _ = form.file.file.into_file().read_to_end(&mut buffer);
-    let content = String::from_utf8(buffer).expect("未获取文件内容");
-
-    ResultRes::success(content)
+    MultipartForm(form): MultipartForm<Uploadform>,
+    data: web::Data<AppState>,
+) -> Result<impl Responder, ResultErr> {
+    let file = save_file(form.file, 0, &data.conn).await?;
+    Ok(ResultRes::success(file))
 }
 
 

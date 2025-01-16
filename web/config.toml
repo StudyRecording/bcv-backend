@@ -29,3 +29,10 @@ migrator_up = true
 level = "info"
 dir = "web/file"
 log_file_prefix = "log"
+
+# 文件内容存储配置
+[storage]
+# root_dir = "C:/Users/28763/BCV"
+# book_dir = "C:/Users/28763/BCV/books"
+# comic_dir = "C:/Users/28763/BCV/comic"
+# video_dir = "C:/Users/28763/BCV/video"
