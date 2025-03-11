@@ -3,6 +3,7 @@ pub mod page;
 pub mod res;
 pub mod token;
 pub mod user_info;
+pub mod zip_read;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right

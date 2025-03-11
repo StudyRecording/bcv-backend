@@ -41,7 +41,7 @@ pub async fn save_file(
     if let Ok(mut new_file) = new_file {
         let mut buf = Vec::new();
         let _ = file.read_to_end(&mut buf);
-        let _ = new_file.write_all(&*buf);
+        let _ = new_file.write_all(&buf);
         return Ok(FileInfo {
             path: file_path,
             file_name,
@@ -79,7 +79,7 @@ pub async fn init_file_config(
     init_file_config_db(db, book_dir.clone(), comic_dir.clone(), video_dir.clone()).await?;
     
     // 初始化文件
-    let book = std::fs::create_dir_all(book_dir);
+    let book = create_dir_all(book_dir);
     if book.is_err() { 
         return Err(ResultErr::BizErr {msg: "初始化书籍目录失败".into()});
     }

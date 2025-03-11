@@ -1,6 +1,5 @@
-use std::time::Duration;
-
 use crate::config::{Config, Storage};
+use actix::Actor;
 use actix_web::{
     http::StatusCode,
     middleware::{from_fn, ErrorHandlers},
@@ -11,33 +10,35 @@ use auth::validator;
 use log::log_middleware;
 use migration::{Migrator, MigratorTrait};
 use sea_orm::{ConnectOptions, Database};
-use service::AppState;
+use service::local_file_storage::init_file_config;
+use service::{AppState, GlobalData};
+use std::time::Duration;
 use test_route::hello_config;
 use tracing_appender::rolling::{RollingFileAppender, Rotation};
 use tracing_subscriber::util::SubscriberInitExt;
-use service::local_file_storage::init_file_config;
 use utils::err::error_handler;
 
 pub mod auth;
 pub mod book;
+mod comic;
+mod config;
 pub mod hello;
 pub mod log;
 pub mod login;
 pub mod test_route;
-mod config;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
     // 获取配置
     let config = match Config::new("web/config.toml") {
         Ok(config) => config,
-        Err(e) => panic!("读取配置文件失败, 原因: {}", e)
+        Err(e) => panic!("读取配置文件失败, 原因: {}", e),
     };
 
     // 日志
     let log_config = config.log;
-    let file_appender = RollingFileAppender::new(Rotation::DAILY, log_config.dir, log_config.log_file_prefix);
+    let file_appender =
+        RollingFileAppender::new(Rotation::DAILY, log_config.dir, log_config.log_file_prefix);
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
     log::log(non_blocking, log_config.level).init();
 
@@ -54,6 +55,7 @@ async fn main() -> std::io::Result<()> {
         // .sqlx_logging_level(log::LevelFilter::Info)
         .set_schema_search_path(db_config.schema_search_path);
 
+    
     let conn = match Database::connect(opt).await {
         Ok(db) => db,
         Err(e) => panic!("获取数据库连接失败, 原因: {}", e),
@@ -63,15 +65,29 @@ async fn main() -> std::io::Result<()> {
         // 如果表不存在则创建
         Migrator::up(&conn, None).await.unwrap();
     }
-    
+
     // 初始化目录
-    let Storage { root_dir: _, book_dir, comic_dir, video_dir } = config.storage;
-    let init_storage = init_file_config(&conn, book_dir.unwrap(), comic_dir.unwrap(), video_dir.unwrap()).await;
-    if init_storage.is_err() { 
+    let Storage {
+        root_dir: _,
+        book_dir,
+        comic_dir,
+        video_dir,
+    } = config.storage;
+    let init_storage = init_file_config(
+        &conn,
+        book_dir.unwrap(),
+        comic_dir.unwrap(),
+        video_dir.unwrap(),
+    )
+    .await;
+    if init_storage.is_err() {
         panic!("初始化文件存储目录失败");
     }
-    
-    let app_data = AppState { conn };
+
+    // 全局数据存储
+    let addr = GlobalData::new(1).start();
+
+    let app_data = AppState { conn, addr };
 
     // 启动应用
     let server_config = config.server;
@@ -85,7 +101,8 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api")
                     .service(web::scope("/user").configure(login::route::login_config))
                     .service(web::scope("/book").configure(book::route::book_config))
-                    .service(web::scope("/test").configure(hello_config)),
+                    .service(web::scope("/test").configure(hello_config))
+                    .service(web::scope("/comic").configure(comic::route::comic_config)),
             )
     })
     .workers(server_config.thread_num)
